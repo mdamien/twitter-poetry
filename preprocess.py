@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 roman_num_lets = set(["I","X", "V", ".", "L"])
+end_sent = set([".", "!", ";", "?"])
 
 def check_roman(word):
     return all(c in roman_num_lets for c in word)
@@ -44,5 +45,16 @@ def clean_lines(lines,lower_case=True, stringify=False):
 			string_res[k] = " ".join(l)
 		res = string_res
     return res
+    
+def separate_sents(poems):
+    sents = []
+    for poem in poems.itervalues():
+        cur = ["back3", "back2", "back1"]
+        for word in poem:
+            cur.append(word)
+            if word in end_sent:
+                sents.append(cur)
+                cur = ["back3", "back2", "back1"]
+    return sents
         
     
