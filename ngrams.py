@@ -126,12 +126,62 @@ def sum_bigrams():
         cur = con.cursor()
         cur.execute("drop table if exists bigrams;")
         cur.execute("create table bigrams (word1 text, word2 text, probability real, summed_prob real);")
+        cur.execute("select * from unigram_probs;")
+        unigrams = [v[0] for v in cur]
+        for unigram in unigrams:
+            current = []
+            cur.execute("select * from bigram_probs where word1=?;",(unigram,))
+            current_sum = 0
+            for bigram in cur:
+                prob = bigram[-1]
+                current_sum += prob
+                word1 = bigram[0]
+                word2 = bigram[1]
+                current.append(tuple((word1, word2, prob, current_sum)))
+            cur.executemany("insert into bigrams values(?,?,?,?)", current)
+            
+def sum_trigrams():
+    with sqlite3.connect(DB_LOC) as con:
+        cur = con.cursor()
+        cur.execute("drop table if exists trigrams;")
+        cur.execute("create table trigrams (word1 text, word2 text, word3, probability real, summed_prob real);")
         cur.execute("select * from bigram_probs;")
-        summed_probs = 0
+        bigrams = [tuple(v[:-1]) for v in cur]
         inserts = []
-        for v in cur:
-            prob = v[-1]
-            summed_probs += prob
-            inserts.append(v+(summed_probs,))
-        cur.executemany("insert into unigrams values(?,?,?)", inserts)
+        for bigram in bigrams:
+            current = []
+            cur.execute("select * from trigram_probs where word1=? and word2=?;",(bigram))
+            current_sum = 0
+            for trigram in cur:
+                prob = trigram[-1]
+                current_sum += prob
+                word1 = trigram[0]
+                word2 = trigram[1]
+                word3 = trigram[2]
+                current.append(tuple((word1, word2, word3, prob, current_sum)))
+            inserts.extend(current)
+        cur.executemany("insert into trigrams values(?,?,?,?, ?)", inserts)
+        
+def sum_quadgrams():
+    with sqlite3.connect(DB_LOC) as con:
+        cur = con.cursor()
+        cur.execute("drop table if exists quadgrams;")
+        cur.execute("create table quadgrams (word1 text, word2 text, word3, word4 text, probability real, summed_prob real);")
+        cur.execute("select * from trigram_probs;")
+        trigrams = [tuple(v[:-1]) for v in cur]
+        inserts = []
+        for trigram in trigrams:
+            current = []
+            cur.execute("select * from quadgram_probs where word1=? and word2=? and word3=?;",(trigram))
+            current_sum = 0
+            for quadgram in cur:
+                prob = quadgram[-1]
+                current_sum += prob
+                word1 = quadgram[0]
+                word2 = quadgram[1]
+                word3 = quadgram[2]
+                word4 = quadgram[3]
+                current.append(tuple((word1, word2, word3, word4, prob, current_sum)))
+            inserts.extend(current)
+        cur.executemany("insert into quadgrams values(?,?,?,?,?,?)", inserts)
         
