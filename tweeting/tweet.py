@@ -1,11 +1,11 @@
 import tweepy
 import re
 
-API_KEY = 'PqYOtC4RZwCN44OEzKhRj31cg'
-API_SECRET = '5whWXtGWnPUYOwvzlvZaggfyyaRyjvHHEfYXSsxPiADmJyyNFu'
+API_KEY = 'KxDwx51HAE0eheL41CdwIsdcX'
+API_SECRET = 'R53A5YJgBZlSdLcAgMlZhsPO6p3hIQmvUazD2yUDdutfNZDyTY'
 
-ACCESS_TOKEN = '2537768726-UFq9WrmA63ejHSlPPFAAONvSF5fifqCqaIyJKcY'
-ACCESS_TOKEN_SECRET = 'O7NppDPJkAlq6zrjyYswhSKNLZcu3mqtFbKjJbz1OMNGe'
+ACCESS_TOKEN = '2537768726-TjOpFSZFwZItRClECxjJ1tbIdJVbAyzTAmPGHvN'
+ACCESS_TOKEN_SECRET = 'ec38puj073WwxWtX1bHb2HWro7BqVdHJOy46my14yLusy'
 
 auth = tweepy.OAuthHandler(API_KEY, API_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
@@ -13,10 +13,7 @@ api = tweepy.API(auth)
 
 WORDS = []
 for x in open('words'):
-    try:
-        WORDS += [x.strip()]
-    except UnicodeDecodeError:
-        print x
+    WORDS += [x.strip()]
 
 def extract_words(tag):
     words = []
@@ -38,13 +35,16 @@ def extract_words(tag):
                         words += [word]
                 except UnicodeDecodeError:
                     pass
-                
     return words
 
 
 def trends():
-    trends = api.trends_place(1)
-    tags = [x['name'] for x in trends[0]['trends'] if x['name'].startswith('#')]
+    tags = set()
+    for woeid in (1, 23424977):
+        trends = api.trends_place(woeid)
+        ts = set([x['name'] for x in trends[0]['trends'] if x['name'].startswith('#')])
+        tags = tags | ts
+
     return [(x,extract_words(x)) for x in tags]
 
 if __name__ == "__main__":
