@@ -12,7 +12,7 @@ auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 api = tweepy.API(auth)
 
 WORDS = []
-for x in open('words'):
+for x in open('db/words'):
     WORDS += [x.strip()]
 
 def extract_words(tag):
