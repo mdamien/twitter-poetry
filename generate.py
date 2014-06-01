@@ -1,16 +1,12 @@
 import sqlite3, random
 from operator import itemgetter
 from preprocess import end_sent
-<<<<<<< HEAD
-DB_LOC = "./tweeting/db/emily_ngrams.db"
+DB_LOC = "./db/emily_ngrams.db"
 
 # from nltk.corpus import names
 # name_list = set([name.lower() for name in names.words()])
 name_list = []
 i_words = set(['i', "i'm", "i'll", "i've", "i'd"])
-=======
-DB_LOC = "el_db.db"
->>>>>>> 00b7917ce570021d6fb37fb3af408a092d4db557
 
 def choose_word_ahead(prev1, prev2, prev3=None):
     choose = random.random()
@@ -145,7 +141,7 @@ def trigrams_back(seed_word, randomize=True):
         word3 = current[2]
         sent.append(word1)
         sent.append(word2)
-        sent.append(word3)
+#         sent.append(word3)
         done = False
         while not done:
             word3 = choose_word_back(word1, word2)
@@ -286,9 +282,9 @@ def eval_lm_sent(sent):
 def eval_lm(sent_list):
     ranked = []
     for sent in sent_list:
-        ranked.append((sent, eval_lm_sent(sent)))
+        ranked.append((sent, eval_lm_sent(sent[:])))
     ranked = sorted(ranked, key=itemgetter(1))
-    return list(ranked[-1][0][2:])
+    return list(ranked[-1][0])
     
 def rejoin(word_list):
     padded = []
@@ -323,9 +319,7 @@ def generate_sentence(seed, tag, num_candidates=5, iters=20, randomize=True):
                 following.append(candidate_next)
         except TypeError:
             pass
-    print prev
     prev = eval_size_chars(prev, max_len/2)[:-1]
-    print prev
     prev_index = (len(prev)-num_candidates)/2
     if prev_index > 0:
         prev=prev[prev_index:-prev_index]

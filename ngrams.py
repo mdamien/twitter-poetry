@@ -1,6 +1,6 @@
 from collections import defaultdict
 import sqlite3
-DB_LOC = "./tweeting/db/emily_ngrams.db"
+DB_LOC = "./db/emily_ngrams.db"
 
 def count_unigrams(sent_list):
     unigrams = defaultdict(int)

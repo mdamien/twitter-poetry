@@ -3,6 +3,7 @@ import tweet
 import sys
 import magic_seeder
 import random
+from generate import generate_sentence
 
 LIVE_FEED = True
 TOPIC_MINING = False
@@ -20,7 +21,8 @@ print 'Topic choosen:', tag
 
 seed = magic_seeder.seed(tag)
 print "Seed: ", seed
-result = gen.gen((seed,), tag)
+# result = gen.gen((seed,), tag)
+result = generate_sentence(seed, tag)
 
 print "Tweet:"
 print

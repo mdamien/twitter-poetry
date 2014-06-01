@@ -1,7 +1,7 @@
 import tweepy
 import re
 
-key_file = '../../keys.txt'
+key_file = '../keys.txt'
 
 with open(key_file) as f:
     for line in f:
