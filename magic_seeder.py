@@ -24,6 +24,7 @@ def clean(status):
     return status
 
 def seed(tag):
+    print
     #get tweets
     if False:
         output = open('st.pkl','rb')
@@ -47,7 +48,6 @@ def seed(tag):
     tag_probs = {}
     idf_con = sqlite3.connect(idf_db_loc)
     idf_cur = idf_con.cursor()
-    print "Starting seed generation"
     for token in unique_tokens:
         to_add = True
         try:
@@ -68,37 +68,16 @@ def seed(tag):
         if to_add:
             tag_probs[token] = prob
     idf_con.close()
-    print "Tf/Idf complete"
     
-#     #let's begin the magic
-#     def tokenize(text):
-#         return text.split()
-# 
-#     token_dict = {
-#             'corpus' : gen.corpus,
-#             'tweets' : ' '.join(tokens)
-#             }
-# 
-#     tfidf = TfidfVectorizer(tokenizer=tokenize, stop_words='english')
-#     tfs = tfidf.fit_transform(token_dict.values())
-# 
-#     feature_names = tfidf.get_feature_names()
-#     comb = []
-#     for col in tfs.nonzero()[1]:
-#         if tfs[0,col] > 0:
-#             comb.append((feature_names[col], tfs[0, col]))
-# 
-#     prob = lambda x: x[1]
-#     comb = list(set(reversed(sorted(comb, key=prob))))
     comb = sorted(tag_probs.iteritems(), key=itemgetter(1), reverse=True) 
     
-    print "Seeds: "
-    for c,p in comb[:10]:
-        print "X" if c in gen.corpus else "_",c,p
+    print "Seeds:",
+    print ', '.join(c for c,p in comb[:10])
     top = []
     for c,p in comb:
         if c in gen.corpus:
             top.append(c)
         if len(top) > 5:
             break
+    print "Usable seeds:",', '.join(top)
     return top
