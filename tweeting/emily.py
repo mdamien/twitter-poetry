@@ -16,8 +16,7 @@ print 'Trending topics:',
 print ', '.join((tag for tag, words in topics))
 tag, context = random.choice(topics)
 
-print 'Topic choosen:', 
-print tag, '(',', '.join(context),')' 
+print 'Topic choosen:', tag 
 
 seed = magic_seeder.seed(tag)
 print "Seed: ", seed

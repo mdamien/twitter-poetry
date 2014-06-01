@@ -3,6 +3,7 @@ import sys
 from nltk.util import tokenwrap
 
 corpus = open('db/data').read()
+
 tokens = nltk.word_tokenize(corpus)
 text = nltk.Text(tokens)
 text.generate(0) #generate model

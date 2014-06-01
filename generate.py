@@ -1,7 +1,7 @@
 import sqlite3, random
 from operator import itemgetter
 from preprocess import end_sent
-DB_LOC = "/Users/benicorp/Dropbox/EmilyTweets/db/emily_ngrams.db"
+DB_LOC = "el_db.db"
 
 def choose_word_ahead(prev1, prev2, prev3=None):
     choose = random.random()

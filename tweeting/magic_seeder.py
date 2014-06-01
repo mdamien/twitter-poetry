@@ -34,7 +34,7 @@ def seed(tag):
     tokens = []
     for s in statuses:
         for w in s:
-            tokens.append(w)
+            tokens.append(w.strip())
 
     #let's begin the magic
     def tokenize(text):
@@ -55,11 +55,16 @@ def seed(tag):
             comb.append((feature_names[col], tfs[0, col]))
 
     prob = lambda x: x[1]
-    comb = list(reversed(sorted(comb, key=prob)))
+    comb = list(set(reversed(sorted(comb, key=prob))))
+    
     print "Seeds: "
     for c,p in comb[:10]:
         print "X" if c in gen.corpus else "_",c,p
+    top = []
     for c,p in comb:
         if c in gen.corpus:
-            return c
-    return "wish" 
+            top.append(c)
+        if len(top) > 5:
+            break
+    print "Choosing between:", ', '.join(top)
+    return random.choice(top)
