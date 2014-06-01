@@ -144,7 +144,7 @@ def sum_trigrams():
     with sqlite3.connect(DB_LOC) as con:
         cur = con.cursor()
         cur.execute("drop table if exists trigrams;")
-        cur.execute("create table trigrams (word1 text, word2 text, word3, probability real, summed_prob real);")
+        cur.execute("create table trigrams (word1 text, word2 text, word3 text, probability real, summed_prob real);")
         cur.execute("select * from bigram_probs;")
         bigrams = [tuple(v[:-1]) for v in cur]
         inserts = []
@@ -166,7 +166,7 @@ def sum_quadgrams():
     with sqlite3.connect(DB_LOC) as con:
         cur = con.cursor()
         cur.execute("drop table if exists quadgrams;")
-        cur.execute("create table quadgrams (word1 text, word2 text, word3, word4 text, probability real, summed_prob real);")
+        cur.execute("create table quadgrams (word1 text, word2 text, word3 text, word4 text, probability real, summed_prob real);")
         cur.execute("select * from trigram_probs;")
         trigrams = [tuple(v[:-1]) for v in cur]
         inserts = []

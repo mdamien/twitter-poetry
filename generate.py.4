@@ -1,0 +1,51 @@
+import sqlite3, random
+from preprocess import end_sent
+DB_LOC = "/Users/benicorp/Dropbox/EmilyTweets/db/emily_ngrams.db"
+
+def generate_sent(seed_word, randomize=True):
+    sent = []
+    word1 = ''
+    word2 = ''
+    word3 = ''
+    word4 = ''
+    with sqlite3.connect(DB_LOC) as con:
+        cur = con.cursor()
+        if randomize:
+            cur.execute("select * from quadgrams where word1='back1' and word3=?", (seed_word,))
+            choose = random.random()
+            current = cur.next()
+            while current[-1] <= choose:
+                current = cur.next()
+        else:
+            cur.execute("select * from quadgrams where word1='back1' and word3=? order by probability desc limit 1;")
+            current = cur.next()
+        word1 = current[1]
+        word2 = current[2]
+        word3 = current[3]
+        sent.append(word1)
+        sent.append(word2)
+        sent.append(word3)
+        while word4 not in end_sent:
+            word4 = choose_word(word1, word2, word3)
+            sent.append(word4)
+            word1, word2, word3 = word2, word3, word4
+    return " ".join(sent)
+    
+
+def choose_word(prev1, prev2, prev3):
+    choose = random.random()
+    with sqlite3.connect(DB_LOC) as con:
+        cur=con.cursor()
+#         try:
+#             cur.execute("select word4 from quadgrams where word1=? and word2=? and word3=? and summed_prob>=? order by summed_prob asc limit 1;", (prev1, prev2, prev3, choose))
+#             res = cur.fetchone()[0]
+#         except TypeError:
+        try:
+            cur.execute("select word3 from trigrams where word1=? and word2=? and summed_prob>=? order by summed_prob asc limit 1;", (prev2, prev3, choose))
+            res = cur.fetchone()[0]
+#             print "trigram", res
+        except TypeError:
+             cur.execute("select word2 from bigrams where word1=? and summed_prob>=? order by summed_prob asc limit 1;", (prev3, choose))
+             res = cur.fetchone()[0]
+             print "bigram", res
+    return res
