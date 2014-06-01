@@ -199,7 +199,7 @@ def sum_unigrams():
         cur = con.cursor()
         cur.execute("drop table if exists unigrams;")
         cur.execute("create table unigrams (word1 text, probability real, summed_prob real);")
-        cur.execute("select * from unigram_probs;")
+        cur.execute("select * from unigram_probs order by probability desc;")
         summed_probs = 0
         inserts = []
         for v in cur:
@@ -217,7 +217,7 @@ def sum_bigrams():
         unigrams = [v[0] for v in cur]
         for unigram in unigrams:
             current = []
-            cur.execute("select * from bigram_probs where word1=?;",(unigram,))
+            cur.execute("select * from bigram_probs where word1=? order by probability desc;",(unigram,))
             current_sum = 0
             for bigram in cur:
                 prob = bigram[-1]
@@ -236,7 +236,7 @@ def reverse_sum_bigrams():
         unigrams = [v[0] for v in cur]
         for unigram in unigrams:
             current = []
-            cur.execute("select * from reverse_bigram_probs where word1=?;",(unigram,))
+            cur.execute("select * from reverse_bigram_probs where word1=? order by probability desc;",(unigram,))
             current_sum = 0
             for bigram in cur:
                 prob = bigram[-1]
@@ -256,7 +256,7 @@ def sum_trigrams():
         inserts = []
         for bigram in bigrams:
             current = []
-            cur.execute("select * from trigram_probs where word1=? and word2=?;",(bigram))
+            cur.execute("select * from trigram_probs where word1=? and word2=? order by probability desc;",(bigram))
             current_sum = 0
             for trigram in cur:
                 prob = trigram[-1]
@@ -278,7 +278,7 @@ def reverse_sum_trigrams():
         inserts = []
         for bigram in bigrams:
             current = []
-            cur.execute("select * from reverse_trigram_probs where word1=? and word2=?;",(bigram))
+            cur.execute("select * from reverse_trigram_probs where word1=? and word2=? order by probability desc;",(bigram))
             current_sum = 0
             for trigram in cur:
                 prob = trigram[-1]
@@ -300,7 +300,7 @@ def sum_quadgrams():
         inserts = []
         for trigram in trigrams:
             current = []
-            cur.execute("select * from quadgram_probs where word1=? and word2=? and word3=?;",(trigram))
+            cur.execute("select * from quadgram_probs where word1=? and word2=? and word3=? order by probability desc;",(trigram))
             current_sum = 0
             for quadgram in cur:
                 prob = quadgram[-1]
@@ -323,7 +323,7 @@ def reverse_sum_quadgrams():
         inserts = []
         for trigram in trigrams:
             current = []
-            cur.execute("select * from reverse_quadgram_probs where word1=? and word2=? and word3=?;",(trigram))
+            cur.execute("select * from reverse_quadgram_probs where word1=? and word2=? and word3=? order by probability desc;",(trigram))
             current_sum = 0
             for quadgram in cur:
                 prob = quadgram[-1]

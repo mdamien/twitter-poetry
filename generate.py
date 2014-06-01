@@ -2,14 +2,17 @@ import sqlite3, random
 from operator import itemgetter
 from preprocess import end_sent
 DB_LOC = "./db/emily_ngrams.db"
+#specify the percentile of n-grams to include in 'boot-strap' choice
+cutoff = 0.75
 
 # from nltk.corpus import names
 # name_list = set([name.lower() for name in names.words()])
 name_list = []
 i_words = set(['i', "i'm", "i'll", "i've", "i'd"])
 
+
 def choose_word_ahead(prev1, prev2, prev3=None):
-    choose = random.random()
+    choose = random.uniform(0,cutoff)
     with sqlite3.connect(DB_LOC) as con:
         cur=con.cursor()
         res = ''
@@ -29,7 +32,7 @@ def choose_word_ahead(prev1, prev2, prev3=None):
     return res
     
 def choose_word_back(next1, next2, next3=None):
-    choose = random.random()
+    choose = random.uniform(0,cutoff)
     with sqlite3.connect(DB_LOC) as con:
         cur=con.cursor()
         res = ''
@@ -94,7 +97,7 @@ def trigrams_forward(seed_word, randomize=True):
         cur = con.cursor()
         if randomize:
             cur.execute("select * from trigrams where word1=?", (seed_word,))
-            choose = random.random()
+            choose = random.uniform(0,cutoff)
             current = cur.next()
             try:
                 while current[-1] <= choose:
@@ -126,7 +129,7 @@ def trigrams_back(seed_word, randomize=True):
         cur = con.cursor()
         if randomize:
             cur.execute("select * from reverse_trigrams where word1=?", (seed_word,))
-            choose = random.random()
+            choose = random.uniform(0,cutoff)
             current = cur.next()
             try:
                 while current[-1] <= choose:
@@ -245,6 +248,8 @@ def count_chars(sent):
     return count
       
 def eval_size_chars(sent_list, max_size):
+    if len(sent_list) == 1 and count_chars(sent_list[0]) <= max_size:
+        return sent_list
     scored = {}
     ordered_sents = sorted([s for s in sent_list if count_chars(s) <= max_size], key=count_chars)
     return ordered_sents
@@ -302,34 +307,40 @@ def rejoin(word_list):
         padded[-1] = "."
     return ''.join(padded)[1:]
     
-def generate_sentence(seed, tag, num_candidates=5, iters=20, randomize=True):
-    prev = []
-    following = []
-    max_len = 140-len(tag)-1
-    for i in range(iters):
-        try:
-            candidate_prev = trigrams_back(seed, randomize)
-            if candidate_prev not in prev:
-                prev.append(candidate_prev)
-        except TypeError:
-            pass
-        try:
-            candidate_next = trigrams_forward(seed, randomize)
-            if candidate_next not in following:
-                following.append(candidate_next)
-        except TypeError:
-            pass
-    prev = eval_size_chars(prev, max_len/2)[:-1]
-    prev_index = (len(prev)-num_candidates)/2
-    if prev_index > 0:
-        prev=prev[prev_index:-prev_index]
-    following = eval_size_chars(following, max_len/2)
-    following_index = (len(following)-num_candidates)/2
-    if following_index > 0:
-        following=following[following_index:-following_index]
-    prev = eval_lm(prev)
-    following = eval_lm(following)
-    prev = prev[:-1]
-    prev.extend(following)
-    return rejoin(prev)
+def generate_sentence(seed, tag, num_candidates=5, iters=40, randomize=True, retry=True):
+    try:
+        prev = []
+        following = []
+        max_len = 140-len(tag)-1
+        for i in range(iters):
+            try:
+                candidate_prev = trigrams_back(seed, randomize)
+                if candidate_prev not in prev:
+                    prev.append(candidate_prev)
+            except TypeError:
+                pass
+            try:
+                candidate_next = trigrams_forward(seed, randomize)
+                if candidate_next not in following:
+                    following.append(candidate_next)
+            except TypeError:
+                pass
+        prev = eval_size_chars(prev, max_len/2)
+        prev_index = (len(prev)-num_candidates)/2
+        if prev_index > 0:
+            prev=prev[prev_index:-prev_index]
+        following = eval_size_chars(following, max_len/2)
+        following_index = (len(following)-num_candidates)/2
+        if following_index > 0:
+            following=following[following_index:-following_index]
+        prev = eval_lm(prev)
+        following = eval_lm(following)
+        prev = prev[:-1]
+        prev.extend(following)
+        return rejoin(prev)
+    except IndexError as e:
+        if retry:
+            return generate_sentence(seed=seed, tag=tag, num_candidates=num_candidates, randomize=randomize, retry=False)
+        else:
+            raise IndexError(e)
     

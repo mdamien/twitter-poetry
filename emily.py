@@ -22,7 +22,12 @@ print 'Topic choosen:', tag
 seed = magic_seeder.seed(tag)
 print "Seed: ", seed
 # result = gen.gen((seed,), tag)
-result = generate_sentence(seed, tag)
+try:
+    result = generate_sentence(seed, tag)
+except IndexError:
+    seed = magic_seeder.seed(tag)
+    print "Reseeding. \nSeed: ", seed
+    result = generate_sentence(seed, tag)
 
 print "Tweet:"
 print
