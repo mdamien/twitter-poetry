@@ -17,11 +17,11 @@ for x in open('db/words'):
 
 def extract_words(tag):
     words = []
-    #if lower case only, try to find words inside
-    if tag.lower() == tag:
+    #if one case only, try to find words inside
+    if tag.lower() == tag or tag.upper() == tag:
         for word in WORDS:
             try:
-                if len(word) > 3 and word in tag.lower():
+                if len(word) > 2 and word in tag.lower():
                     words += [word]
             except UnicodeDecodeError:
                 pass
@@ -40,7 +40,7 @@ def extract_words(tag):
 
 def trends():
     tags = set()
-    for woeid in (1, 23424977):
+    for woeid in (23424977,):
         trends = api.trends_place(woeid)
         ts = set([x['name'] for x in trends[0]['trends'] if x['name'].startswith('#')])
         tags = tags | ts
