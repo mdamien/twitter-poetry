@@ -3,7 +3,7 @@ from operator import itemgetter
 from preprocess import end_sent
 DB_LOC = "./db/emily_ngrams.db"
 #specify the percentile of n-grams to include in 'boot-strap' choice
-cutoff = 0.75
+cutoff = 0.55
 
 # from nltk.corpus import names
 # name_list = set([name.lower() for name in names.words()])
@@ -113,10 +113,15 @@ def trigrams_forward(seed_word, randomize=True):
         sent.append(word1)
         sent.append(word2)
         sent.append(word3)
+        prev_word1 = word1
         word1, word2 = word2, word3
         while word3 not in end_sent:
-            word3 = choose_word_ahead(word1, word2)
+            if not all((word1.isalpha(), word2.isalpha())):
+                word3 = choose_word_ahead(prev_word1, word1, word2)
+            else:
+                word3 = choose_word_ahead(word1, word2)
             sent.append(word3)
+            prev_word1 = word1
             word1, word2 = word2, word3
     return sent
     
@@ -144,12 +149,17 @@ def trigrams_back(seed_word, randomize=True):
         word3 = current[2]
         sent.append(word1)
         sent.append(word2)
-#         sent.append(word3)
+        prev_word1 = word1
+        word1, word2 = word2, word3
         done = False
         while not done:
-            word3 = choose_word_back(word1, word2)
+            if not all((word1.isalpha(), word2.isalpha())):
+                word3 = choose_word_back(prev_word1, word1, word2)
+            else:
+                word3 = choose_word_back(word1, word2)
             if not word3[-1].isdigit():
                 sent.append(word3)
+                prev_word1 = word1
                 word1, word2 = word2, word3
             else:
                 done = True
@@ -307,7 +317,7 @@ def rejoin(word_list):
         padded[-1] = "."
     return ''.join(padded)[1:]
     
-def generate_sentence(seed, tag, num_candidates=5, iters=40, randomize=True, retry=True):
+def generate_sentence(seed, tag, num_candidates=5, iters=40, randomize=True, retry=2):
     try:
         prev = []
         following = []
