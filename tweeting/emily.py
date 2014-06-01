@@ -1,10 +1,10 @@
 import gen
 import tweet
 import sys
-import seeder
+import magic_seeder
 import random
 
-LIVE_FEED = False
+LIVE_FEED = True
 TOPIC_MINING = False
 
 if LIVE_FEED:
@@ -14,40 +14,14 @@ else:
 
 print 'Trending topics:',
 print ', '.join((tag for tag, words in topics))
-topics = list((tag,words) for tag, words in topics if len(words) > 0)
-
-print 'Valid topics:   ',
-print ', '.join(("%s (%s)" % (tag, len(words)) for tag, words in topics))
-
-if TOPIC_MINING:
-    print 'Topic mining..  :'
-
-    topics_mined = []
-    for tag, words in topics:
-        all_seeds = set(words)
-        for word in words:
-            if len(all_seeds) > 2:
-                break
-            seeds = seeder.seeds(word)
-            if len(seeds):
-                all_seeds |= set(seeds)
-        if len(all_seeds) > 0:
-            topics_mined.append((tag, all_seeds))
-    topics = topics_mined
-
-print "Topics processed:"
-for tag, words in topics:
-    print "    ",tag,':',', '.join(words)
-
-if len(topics) == 0:
-    print "No valid topics, aborting"
-    sys.exit(0)
 tag, context = random.choice(topics)
 
 print 'Topic choosen:', 
 print tag, '(',', '.join(context),')' 
 
-result = gen.gen(context, tag)
+seed = magic_seeder.seed(tag)
+print "Seed: ", seed
+result = gen.gen((seed,), tag)
 
 print "Tweet:"
 print
