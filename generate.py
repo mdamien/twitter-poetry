@@ -8,7 +8,7 @@ cutoff = 0.55
 # from nltk.corpus import names
 # name_list = set([name.lower() for name in names.words()])
 name_list = []
-i_words = set(['i', "i'm", "i'll", "i've", "i'd"])
+i_words = set(['i', "i'm", "i'll", "i've", "i'd","it's"])
 
 
 def choose_word_ahead(prev1, prev2, prev3=None):

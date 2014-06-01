@@ -16,14 +16,18 @@ if not FORCED_SEED:
         topics = list(tweet.trends())
         print 'Trending topics:',
         print ', '.join((tag for tag, words in topics))
+        """
         with open('db/used_tags','r') as used:
             useds = set(w.strip() for w in used)
             new_topics = list((t,w) for t,w in topics if t not in useds)
             if len(new_topics) > 0:
                 topics = new_topics
+        """
         topics = list((t,w) for t,w in topics if t.startswith('#'))
+        """
         print 'Topic filtered:',
         print ', '.join((tag for tag, words in topics))
+        """
         tag, context = random.choice(topics)
         print 'Topic choosen:', tag 
         seeds = magic_seeder.seed(tag)
@@ -53,7 +57,7 @@ result += " "+tag
 
 print
 print "Tweet:"
-print result
+print '\033[92m'+result+'\033[0m'
 print
 
 answ = raw_input("Do you want to tweet it ? (y/N): ")
@@ -64,3 +68,5 @@ if answ.lower() == 'y':
     print "Tweeted!"
 else:
     print "Not tweeted"
+print
+print

@@ -83,5 +83,5 @@ def seed(tag):
                 top.append(c)
             if len(top) > 5:
                 break
-    print "Usable seeds:",', '.join(top)
+    #print "Usable seeds:",', '.join(top)
     return top
