@@ -1,7 +1,7 @@
 import sqlite3, random
 from operator import itemgetter
 from preprocess import end_sent
-DB_LOC = "./emily_ngrams.db"
+DB_LOC = "./tweeting/db/emily_ngrams.db"
 
 # from nltk.corpus import names
 # name_list = set([name.lower() for name in names.words()])
@@ -252,6 +252,7 @@ def eval_size_chars(sent_list, max_size):
 def eval_lm_sent(sent):
     sent.insert(0, "back1")
     sent.insert(0, "back2")
+    sent.insert(0, "back3")
     prob = 1
     with sqlite3.connect(DB_LOC) as con:
         cur = con.cursor()
