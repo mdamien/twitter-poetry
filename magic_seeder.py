@@ -52,13 +52,13 @@ def seed(tag):
         to_add = True
         try:
             prob = emily_weight * idf_cur.execute("select score from emily_tfidf where word=?", (token,)).fetchone()[0]
-        except (IndexError, TypeError) as e:
+        except (IndexError, TypeError):
             prob = emily_weight * tfidf_emily(token)
         if not prob:
             to_add = False
         try:
             idf = idf_cur.execute("select score from idf where word=?", (token,)).fetchone()[0]
-        except (IndexError, TypeError) as e:
+        except (IndexError, TypeError):
             idf = get_idf(token)
         token_tf = tf_tag(token, token_counts[token], total_tokens)
         tweet_tfidf = tweet_weight * idf * token_tf
@@ -101,5 +101,4 @@ def seed(tag):
             top.append(c)
         if len(top) > 5:
             break
-    print "Choosing between:", ', '.join(top)
-    return random.choice(top)
+    return top

@@ -5,30 +5,36 @@ import magic_seeder
 import random
 from generate import generate_sentence
 
-LIVE_FEED = True
-TOPIC_MINING = False
+FORCED_SEED = len(sys.argv) == 3
+LIVE_FEED = not FORCED_SEED
 
-if LIVE_FEED:
-    topics = list(tweet.trends())
+if not FORCED_SEED:
+    if LIVE_FEED:
+        topics = list(tweet.trends())
+    else:
+        topics = [(u'#TanDificilEsQue', ['tan', 'que']), (u'#MariahNBC', ['mariah']), (u'#junewish', ['june', 'wish']), (u'#wits', []), (u'#FuerzaMontes', []), (u'#50ThingsAboutMyTwitterBestFriend', ['things', 'about', 'best', 'friend']), (u'#oRappaNoMultishow', []), (u'#KissConcert', ['kiss', 'concert'])]
+
+    print 'Trending topics:',
+    print ', '.join((tag for tag, words in topics))
+    tag, context = random.choice(topics)
+    print 'Topic choosen:', tag 
+    seeds = magic_seeder.seed(tag)
 else:
-    topics = [(u'#TanDificilEsQue', ['tan', 'que']), (u'#MariahNBC', ['mariah']), (u'#junewish', ['june', 'wish']), (u'#wits', []), (u'#FuerzaMontes', []), (u'#50ThingsAboutMyTwitterBestFriend', ['things', 'about', 'best', 'friend']), (u'#oRappaNoMultishow', []), (u'#KissConcert', ['kiss', 'concert'])]
+    tag = sys.argv[2]
+    seed = sys.argv[1]
+    seeds = (seed,)
 
-print 'Trending topics:',
-print ', '.join((tag for tag, words in topics))
-tag, context = random.choice(topics)
 
-print 'Topic choosen:', tag 
-
-seed = magic_seeder.seed(tag)
-print "Seed: ", seed
-# result = gen.gen((seed,), tag)
-try:
-    result = generate_sentence(seed, tag)
-except IndexError:
-    "Reseeding. \n"
-    seed = magic_seeder.seed(tag)
-    print "New seed:", seed
-    result = generate_sentence(seed, tag)
+while True:
+    try:
+        seed = random.choice(seeds)
+        print " trying seed: ", seed
+        result = generate_sentence(seed, tag)
+        if 'ack1' in result or 'ack2' in result:
+            raise Exception()
+        break
+    except (IndexError, Exception, StopIteration):
+        print "...failed"
 
 result += " "+tag
 
