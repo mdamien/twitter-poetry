@@ -14,8 +14,15 @@ print
 if not FORCED_SEED:
     if not FORCED_TAG:
         topics = list(tweet.trends())
-        topics = list((t,w) for t,w in topics if t.startswith('#'))
         print 'Trending topics:',
+        print ', '.join((tag for tag, words in topics))
+        with open('db/used_tags','r') as used:
+            useds = set(w.strip() for w in used)
+            new_topics = list((t,w) for t,w in topics if t not in useds)
+            if len(new_topics) > 0:
+                topics = new_topics
+        topics = list((t,w) for t,w in topics if t.startswith('#'))
+        print 'Topic filtered:',
         print ', '.join((tag for tag, words in topics))
         tag, context = random.choice(topics)
         print 'Topic choosen:', tag 
@@ -38,7 +45,9 @@ while True:
             raise Exception()
         break
     except (IndexError, Exception, StopIteration):
-        print " -> failed"
+        with open('db/bad_seeds','a') as bads:
+            bads.write(seed+'\n')
+        print " -> failed (added to blacklist)"
 
 result += " "+tag
 
@@ -50,6 +59,8 @@ print
 answ = raw_input("Do you want to tweet it ? (y/N): ")
 if answ.lower() == 'y':
     tweet.api.update_status(result)
+    with open('db/used_tags','a') as used:
+        used.write(tag+'\n')
     print "Tweeted!"
 else:
     print "Not tweeted"

@@ -11,6 +11,7 @@ from tfidf import *
 emily_weight = .6
 tweet_weight = .4
 
+
 COMMON = list(w.strip() for w in open('db/words').readlines()[:100])
 
 def clean(status):
@@ -74,10 +75,13 @@ def seed(tag):
     print "Seeds:",
     print ', '.join(c for c,p in comb[:10])
     top = []
-    for c,p in comb:
-        if c in gen.corpus:
-            top.append(c)
-        if len(top) > 5:
-            break
+    
+    with open('db/bad_seeds','r') as bad_seeds: 
+        bads = set(w.strip() for w in bad_seeds)
+        for c,p in comb:
+            if c in gen.corpus and c not in bads:
+                top.append(c)
+            if len(top) > 5:
+                break
     print "Usable seeds:",', '.join(top)
     return top
