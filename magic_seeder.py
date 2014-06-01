@@ -45,12 +45,30 @@ def seed(tag):
     total_tokens = float(sum(token_counts.itervalues()))
     unique_tokens = set(tokens)
     tag_probs = {}
+    idf_con = sqlite3.connect(idf_db_loc)
+    idf_cur = idf_con.cursor()
     print "Starting seed generation"
     for token in unique_tokens:
-        prob = emily_weight * tfidf_emily(token)
-        prob += tweet_weight *tfidf_tags(token, token_counts[token], total_tokens)
-        tag_probs[token] = prob
-    print "TfIdf complete"
+        to_add = True
+        try:
+            prob = emily_weight * idf_cur.execute("select score from emily_tfidf where word=?", (token,)).fetchone()[0]
+        except (IndexError, TypeError) as e:
+            prob = emily_weight * tfidf_emily(token)
+        if not prob:
+            to_add = False
+        try:
+            idf = idf_cur.execute("select score from idf where word=?", (token,)).fetchone()[0]
+        except (IndexError, TypeError) as e:
+            idf = get_idf(token)
+        token_tf = tf_tag(token, token_counts[token], total_tokens)
+        tweet_tfidf = tweet_weight * idf * token_tf
+        if not tweet_tfidf:
+            to_add = False
+        prob += tweet_tfidf
+        if to_add:
+            tag_probs[token] = prob
+    idf_con.close()
+    print "Tf/Idf complete"
     
 #     #let's begin the magic
 #     def tokenize(text):
