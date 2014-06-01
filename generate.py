@@ -1,12 +1,16 @@
 import sqlite3, random
 from operator import itemgetter
 from preprocess import end_sent
+<<<<<<< HEAD
 DB_LOC = "./tweeting/db/emily_ngrams.db"
 
 # from nltk.corpus import names
 # name_list = set([name.lower() for name in names.words()])
 name_list = []
 i_words = set(['i', "i'm", "i'll", "i've", "i'd"])
+=======
+DB_LOC = "el_db.db"
+>>>>>>> 00b7917ce570021d6fb37fb3af408a092d4db557
 
 def choose_word_ahead(prev1, prev2, prev3=None):
     choose = random.random()
