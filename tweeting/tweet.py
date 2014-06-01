@@ -1,11 +1,12 @@
 import tweepy
 import re
 
-API_KEY = 'KxDwx51HAE0eheL41CdwIsdcX'
-API_SECRET = 'R53A5YJgBZlSdLcAgMlZhsPO6p3hIQmvUazD2yUDdutfNZDyTY'
+key_file = '../../keys.txt'
 
-ACCESS_TOKEN = '2537768726-TjOpFSZFwZItRClECxjJ1tbIdJVbAyzTAmPGHvN'
-ACCESS_TOKEN_SECRET = 'ec38puj073WwxWtX1bHb2HWro7BqVdHJOy46my14yLusy'
+with open(key_file) as f:
+    for line in f:
+        line = line.strip()
+        exec(line)
 
 auth = tweepy.OAuthHandler(API_KEY, API_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
