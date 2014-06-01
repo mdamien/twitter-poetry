@@ -25,9 +25,12 @@ print "Seed: ", seed
 try:
     result = generate_sentence(seed, tag)
 except IndexError:
+    "Reseeding. \n"
     seed = magic_seeder.seed(tag)
-    print "Reseeding. \nSeed: ", seed
+    print "New seed:", seed
     result = generate_sentence(seed, tag)
+
+result += " "+tag
 
 print "Tweet:"
 print
